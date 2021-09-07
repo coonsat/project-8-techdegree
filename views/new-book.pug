@@ -3,5 +3,11 @@ extends layout.pug
 block content 
 
     h1="New Book"
-        form(action="/books/add-book", method="post")
-          include form
+
+    h2.error=`${error ? 'Oooops!' : ''}`
+      ul 
+        each error in errors
+          li.error=error.message
+
+    form(action="/books/add-book", method="post")
+      include form

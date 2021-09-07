@@ -8,25 +8,27 @@ module.exports = (sequelize) => {
                 {
                     type: Sequelize.STRING,
                     allowNull: false,
-                    validate: 
-                        {
-                            notNull: 
-                                {
-                                    msg: 'Title is a mandatory field'
-                                }
+                    validate: {
+                        notNull: {
+                            msg: 'It looks like you forgot to fill the title field'
+                        },
+                        notEmpty: {
+                            msg: 'It looks like you forgot to fill the title field'
                         }
+                    }
                 },
             author: 
                 {
                     type: Sequelize.STRING,
                     allowNull: false,
-                    validate: 
-                        {
-                            notNull: 
-                                {
-                                    msg: 'Author is a mandatory field'
-                                }
+                    validate: {
+                        notNull: {
+                            msg: 'It looks like you forgot to fill the author field'
+                        },
+                        notEmpty: {
+                            msg: 'It looks like you forgot to fill the author field'
                         }
+                    }
                 },
             genre: 
                 {
