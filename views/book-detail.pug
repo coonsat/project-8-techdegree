@@ -2,7 +2,10 @@ extends layout.pug
 
 block content 
 
-  h1=book.title 
+  h1=book.title
+
+  a.button(href=`${book.id}/edit`)="Edit Book"
+  a.button(href=`${book.id}/delete`)="Delete Book"
 
   p=book.author
 

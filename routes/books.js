@@ -53,9 +53,21 @@ router.get('/:id', asyncHandler(async (req, res) => {
   }
 ));
 
-// Edit book from library
+// Render edit page for book
 router.get('/:id/edit', asyncHandler(async (req, res) => {
-        const book = await Book.findByPk(req.params.id);
+    const book = await Book.findByPk(req.params.id);
+    if (book) {
+        res.render('edit-book', { book });
+    } else {
+        res.sendStatus(404);
+    }
+  }
+)
+);
+
+// Edit book from library
+router.post('/:id/edit', asyncHandler(async (req, res) => {
+        let book = await Book.findByPk(req.params.id);
         if (book) {
             book = await book.update(req.body);
             res.redirect(`books/${book.id}`);
@@ -66,7 +78,7 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
     )
 );
 
-// Delete book from library
+// Delete book from library -> no caution added
 router.post('/:id/delete', asyncHandler(async (req, res) => {
         const book = await Book.findByPk(req.params.id);
         if (book) {
