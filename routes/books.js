@@ -67,10 +67,11 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
 
 // Edit book from library
 router.post('/:id/edit', asyncHandler(async (req, res) => {
+    console.log('Arrived here')
         let book = await Book.findByPk(req.params.id);
         if (book) {
             book = await book.update(req.body);
-            res.redirect(`books/${book.id}`);
+            res.redirect('/');
         } else {
             res.sendStatus(404);
         }
