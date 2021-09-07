@@ -53,6 +53,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
   }
 ));
 
+// Edit book from library
 router.get('/:id/edit', asyncHandler(async (req, res) => {
         const book = await Book.findByPk(req.params.id);
         if (book) {
@@ -65,6 +66,17 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
     )
 );
 
-
+// Delete book from library
+router.post('/:id/delete', asyncHandler(async (req, res) => {
+        const book = await Book.findByPk(req.params.id);
+        if (book) {
+            await book.delete(book.id);
+            res.redirect('/');
+        } else {
+            res.sendStatus(404);
+        }
+    }
+  )
+);
 
 module.exports = router;

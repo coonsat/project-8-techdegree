@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const app = express();
 const chalk = require('chalk');
-const Book = require('./models').Book;
 const db = require('./models');
 const PORT = 4000;
 
@@ -74,6 +73,8 @@ app.use( (err, req, res, next) => {
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // Render the error page
+    console.log('Ping Im here')
+    if (res.status === 404) res.render('page_not_found', { err });
     res.status(err.status || 500);
     res.render('error');
 });
