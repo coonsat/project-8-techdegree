@@ -7,6 +7,7 @@ const logger = require('morgan');
 const app = express();
 const chalk = require('chalk');
 const Book = require('./models').Book;
+const db = require('./models');
 const PORT = 4000;
 
 //Highlights
@@ -22,11 +23,30 @@ colour = (colour, text) => {
     return null;
 };
 
+// Authenticate the database connection
+(async () => {
+    console.log('I am here');
 
-// // get instantiated sequelize
-// const db = require('./models');
-// const Book = require('./models').Book;
-// // const Book = require('./models').Book;
+    await db.sequelize.sync({ force: true});
+    console.log('I am here');
+
+    try {
+
+        await db.sequelize.authenticate();
+        console.log(colour(SUCCESS, 'Connection to the database was successful'));
+
+    } catch (error) {
+
+        if (error.name === 'SequelizeValidationError') {
+            console.log(colour(WARNING, "A validation error in the database exists"));
+            const errors = error.errors.map(err => err.message);
+            console.log(colour(WARNING, errors));
+        } else {
+            throw error;
+        }
+    };
+});
+
 
 // Set up view engine
 app.set('views', path.join(__dirname, 'views'));
