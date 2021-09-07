@@ -23,14 +23,14 @@ router.get('/', asyncHandler(async (req, res) => {
 );
 
 // Post route to add book to database
-router.post('/', asyncHandler(async (req, res) => {
-    console.log(req.body);
-    const book = await Book.build({
+router.post('/add-book', asyncHandler(async (req, res) => {
+    const book = await Book.create({
         title: req.body.title,
         author: req.body.author,
         genre: req.body.genre,
         year: req.body.year
     });
+    await book.save();
     res.redirect('/');
     }
   )
