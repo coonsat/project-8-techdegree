@@ -1,0 +1,9 @@
+extends layout.pug
+
+block content 
+
+  h1=`Are you sure you want to delete ${book.title}?`
+
+  form(action=`/books/${book.id}/delete`, method="post")
+    a(href=`/books/${book.id}`) "No, I'm not"
+    input(type="submit" value="Yes, I'm sure")

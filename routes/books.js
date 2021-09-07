@@ -30,8 +30,12 @@ router.post('/add-book', asyncHandler(async (req, res) => {
         genre: req.body.genre,
         year: req.body.year
     });
-    await book.save();
-    res.redirect('/');
+    if (book) {
+        await book.save();
+        res.redirect('/')
+    } else {
+        console.log("Something happened")
+    }
     }
   )
 );
@@ -67,7 +71,6 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
 
 // Edit book from library
 router.post('/:id/edit', asyncHandler(async (req, res) => {
-    console.log('Arrived here')
         let book = await Book.findByPk(req.params.id);
         if (book) {
             book = await book.update(req.body);
@@ -79,11 +82,23 @@ router.post('/:id/edit', asyncHandler(async (req, res) => {
     )
 );
 
+// First ask for confirmation to delete book
+router.get('/:id/delete', asyncHandler(async (req, res) => {
+        const book = await Book.findByPk(req.params.id);
+        if (book) {
+            res.render('delete-book', { book });
+        } else {
+            res.sendStatus(404);
+        }
+    }
+  )
+);
+
 // Delete book from library -> no caution added
 router.post('/:id/delete', asyncHandler(async (req, res) => {
         const book = await Book.findByPk(req.params.id);
         if (book) {
-            await book.delete(book.id);
+            await book.destroy();
             res.redirect('/');
         } else {
             res.sendStatus(404);
