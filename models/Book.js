@@ -36,6 +36,7 @@ module.exports = (sequelize) => {
                 {
                     type: Sequelize.INTEGER
                 }
-        }
+        }, { sequelize }
     );
+    return Book;
 }

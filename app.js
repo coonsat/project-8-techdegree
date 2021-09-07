@@ -1,73 +1,94 @@
 const Sequelize = require('sequelize');
+const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-// const cookieParser = require('cookie-parser');
-// const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const app = express();
 const chalk = require('chalk');
+const Book = require('./models').Book;
+const PORT = 4000;
 
-// // get instantiated sequelize -- NOT SURE WHAT IM DOING HERE!!
-const db = require('./models');
-// const { Book } = db.models;
+//Highlights
+const SUCCESS = 'SUCCESS';
+const WARNING = 'WARNING';
+const ALARM = 'ALARM',
+colour = (colour, text) => {
+    switch(colour) {
+        case SUCCESS: return chalk.green(text);
+        case WARNING: return chalk.orange(text);
+        case ALARM: return chalk.red(text);
+    };
+    return null;
+};
+
+
+// // get instantiated sequelize
+// const db = require('./models');
 // const Book = require('./models').Book;
+// // const Book = require('./models').Book;
 
-// // Determine the routes
-// const routes = require('./routes/books');
+// Set up view engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
-// // Set up view engine
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'pug');
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use(logger('dev'));
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, 'public')));
+// Instantiate the routes
+app.use('/', require('./routes'));
+app.use('/books', require('./routes/books'));
 
-// // Instantiate the routes
-// app.use('/', routes);
+// Catch 404 and forward to error handler
+app.use( (req, res, next) => {
+    next(createError(404));
+});
 
-// // Catch 404 and forward to error handler
-// app.use( (req, res, next) => {
-//     next(createError(404));
-// });
+// Error handler
+app.use( (err, req, res, next) => {
+    // Set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-// // Error handler
-// app.use( (err, req, res, next) => {
-//     // Set locals, only providing error in development
-//     res.locals.message = err.message;
-//     res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // Render the error page
+    res.status(err.status || 500);
+    res.render('error');
+});
 
-//     // Render the error page
-//     res.status(err.status || 500);
-//     res.render('error');
-// });
+app.listen(PORT, () => {
+    console.log(colour(SUCCESS, `The application is now running on port ${PORT}`));
+});
 
-// module.exports = app;
+module.exports = app;
 
-(async () => {
-    await db.sequelize.sync({ force: true });
 
-    try {
-        await db.sequelize.authenticate();
-        console.log('Connection to the database was successful!');
+// (async () => {
+//     await db.sequelize.sync({ force: true });
 
-        const book = await Book.create({
-            title: 'The land of the dead',
-            author: 'Somting wong',
-            genre: 'romance',
-            year: '2018'
-        });
-        await book.save();
-        console.log(book.toJSON());
+//     try {
+//         await db.sequelize.authenticate();
+//         console.log(chalk.green('Connection to the database was successful!'));
 
-    } catch (error) {
-        if (error.name === 'SequelizeValidationError') {
-            const errors = errors.errors.map(err => err.message);
-            console.log(chalk.red('A validation has been violed: ') + errors);
-        } else {
-            throw error;
-        }
-    }
+//         const book = await Book.create({
+//             title: 'The land of the dead',
+//             author: 'Somting wong',
+//             genre: 'romance',
+//             year: 2018
+//         });
+//         await book.save();
+//         console.log(book.toJSON());
 
-})();
+//     } catch (error) {
+//         const errors = errors.errors.map(err => err.message);
+//         if (error.name === 'SequelizeValidationError') {
+//             console.log(chalk.red('A validation has been violated: ') + errors);
+//         } else {
+//             console.log(chalk.red('The following error has occured: ') + errors);
+//             throw error;
+//         }
+//     }
+
+// })();
