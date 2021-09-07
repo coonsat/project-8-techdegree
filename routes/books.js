@@ -18,7 +18,7 @@ function asyncHandler(cb) {
 
 // Route to home page
 router.get('/', asyncHandler(async (req, res) => {
-    const books = await Book.findAll({ order: [[ 'createdAt', 'DESC']] });
+    const books = await Book.findAll({order: [[ 'year', 'DESC']]});
     res.render('index', { books } );
     }
   )
@@ -120,20 +120,18 @@ router.post('/:id/delete', asyncHandler(async (req, res) => {
 
 // Search for books in library
 router.post('/search', asyncHandler(async (req, res) => {
-    console.log(req.body.search);
     const search = req.body.search.toLowerCase();
     const books = await Book.findAll({
         where: {
-            [Op.like]: 
-                [
-                    {author: search},
-                    {title: search},
-                    {genre: search},
-                    {year: search},
-                ]
-        }
+            [Op.or]: [
+                {title: {[Op.like]: `%${search}%`}},
+                {author: {[Op.like]: `%${search}%`}},
+                {author: {[Op.like]: `%${search}%`}}
+            ]
+        },
+        order: [['year', 'DESC']]
     })
-    res.render('index', books);
+    res.render('index', { books });
 }));
 
 module.exports = router;
