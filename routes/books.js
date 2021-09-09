@@ -26,7 +26,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // Post route to add book to database
 router.post('/add-book', asyncHandler(async (req, res) => {
-        const tempBook = {
+        const book = {
                 title: req.body.title,
                 author: req.body.author,
                 genre: req.body.genre,
@@ -34,18 +34,18 @@ router.post('/add-book', asyncHandler(async (req, res) => {
         };
 
         try {
-            const book = await Book.create({
-                title: tempBook.title,
-                author: tempBook.author,
-                genre: tempBook.genre,
-                year: tempBook.year
+            const newBook = await Book.create({
+                title: book.title,
+                author: book.author,
+                genre: book.genre,
+                year: book.year
             });
-            await book.save();
+            await newBook.save();
             res.redirect('/')
         } catch (error) {
             const errors = error.errors;
             console.log(error)
-            res.render('new-book', { tempBook, errors })
+            res.render('new-book', { book, errors })
         }
     }
   )
@@ -53,7 +53,7 @@ router.post('/add-book', asyncHandler(async (req, res) => {
 
 // Form page for creating a new book
 router.get('/new-book', (req, res) => {
-    res.render('new-book');
+    res.render('new-book', {});
 });
 
 // See detail page of specific book in list. 

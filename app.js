@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -37,7 +37,7 @@ colour = (colour, text) => {
     } catch (error) {
 
         if (error.name === 'SequelizeValidationError') {
-            console.log(colour(WARNING, "A validation error in the database exists"));
+            console.log(colour(WARNING, "The database could not be generated"));
             const errors = error.errors.map(err => err.message);
             console.log(colour(WARNING, errors));
         } else {
