@@ -12,10 +12,7 @@ const asyncHandler = cb => {
             console.log('After error triggered')
         } catch (error) {
             // Forward error to the global error handler
-            console.log('Error triggered')
-
             next(error);
-            // res.render('error', { error });
         };
     };
 };
@@ -83,8 +80,6 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
     if (book) {
         res.render('edit-book', { book });
     } else {
-        // error
-        // res.sendStatus(404);
         errorHandler(404, "A problem occured when fetching your book");
     }
   }
