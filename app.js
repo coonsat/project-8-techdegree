@@ -24,16 +24,12 @@ colour = (colour, text) => {
 
 // Authenticate the database connection
 (async () => {
-    console.log('I am here');
-
     await db.sequelize.sync({ force: true});
-    console.log('I am here');
 
     try {
-
         await db.sequelize.authenticate();
         console.log(colour(SUCCESS, 'Connection to the database was successful'));
-
+        
     } catch (error) {
 
         if (error.name === 'SequelizeValidationError') {
@@ -66,17 +62,22 @@ app.use( (req, res, next) => {
     next(createError(404));
 });
 
-// Error handler
+// Global error handler
 app.use( (err, req, res, next) => {
     // Set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // Render the error page
-    console.log('Ping Im here')
-    if (res.status === 404) res.render('page_not_found', { err });
-    res.status(err.status || 500);
-    res.render('error');
+    if (res.status === 404) {
+        const message = 'Something went wrong';
+        res.render('page_not_found', { message, err });
+    } else {
+        const message = 'The page your looking for cannot be found';
+        res.status(err.status || 500);
+        res.render('error',  { message, err });
+    }
+    next();
 });
 
 app.listen(PORT, () => {
@@ -84,32 +85,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-
-
-// (async () => {
-//     await db.sequelize.sync({ force: true });
-
-//     try {
-//         await db.sequelize.authenticate();
-//         console.log(chalk.green('Connection to the database was successful!'));
-
-//         const book = await Book.create({
-//             title: 'The land of the dead',
-//             author: 'Somting wong',
-//             genre: 'romance',
-//             year: 2018
-//         });
-//         await book.save();
-//         console.log(book.toJSON());
-
-//     } catch (error) {
-//         const errors = errors.errors.map(err => err.message);
-//         if (error.name === 'SequelizeValidationError') {
-//             console.log(chalk.red('A validation has been violated: ') + errors);
-//         } else {
-//             console.log(chalk.red('The following error has occured: ') + errors);
-//             throw error;
-//         }
-//     }
-
-// })();

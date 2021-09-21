@@ -5,15 +5,25 @@ const router = express.Router();
 const Book = require('../models').Book;
 
 // Handler function to wrap each route
-function asyncHandler(cb) {
+const asyncHandler = cb => {
     return async(req, res, next) => {
         try {
             await cb(req, res, next);
+            console.log('After error triggered')
         } catch (error) {
             // Forward error to the global error handler
+            console.log('Error triggered')
+
             next(error);
+            // res.render('error', { error });
         };
     };
+};
+
+const errorHandler = (errorStatus, message) => {
+    const error = new Error(message);
+    error.status = errorStatus;
+    throw error;
 };
 
 // Route to home page
@@ -44,8 +54,7 @@ router.post('/add-book', asyncHandler(async (req, res) => {
             res.redirect('/')
         } catch (error) {
             const errors = error.errors;
-            console.log(error)
-            res.render('new-book', { book, errors })
+            res.render('new-book', { book, errors });
         }
     }
   )
@@ -60,10 +69,10 @@ router.get('/new-book', (req, res) => {
 // Redirect to status error if the book entered doesn't exist
 router.get('/:id', asyncHandler(async (req, res) => {
     const book = await Book.findByPk(req.params.id);
-    if (book) {
+    if ( book ) {
         res.render('book-detail', { book });
     } else {
-        res.sendStatus(404);
+        errorHandler(404, "Book not found");
     }
   }
 ));
@@ -74,7 +83,9 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
     if (book) {
         res.render('edit-book', { book });
     } else {
-        res.sendStatus(404);
+        // error
+        // res.sendStatus(404);
+        errorHandler(404, "A problem occured when fetching your book");
     }
   }
 )
@@ -87,7 +98,7 @@ router.post('/:id/edit', asyncHandler(async (req, res) => {
             book = await book.update(req.body);
             res.redirect('/');
         } else {
-            res.sendStatus(404);
+            errorHandler(404, "A problem occured when editing your book");
         }
       }
     )
@@ -99,7 +110,7 @@ router.get('/:id/delete', asyncHandler(async (req, res) => {
         if (book) {
             res.render('delete-book', { book });
         } else {
-            res.sendStatus(404);
+            errorHandler(404, "A problem occured when deleting your book");
         }
     }
   )
@@ -112,7 +123,7 @@ router.post('/:id/delete', asyncHandler(async (req, res) => {
             await book.destroy();
             res.redirect('/');
         } else {
-            res.sendStatus(404);
+            errorHandler(404, "A problem occured when deleting your book");
         }
     }
   )
@@ -126,7 +137,7 @@ router.post('/search', asyncHandler(async (req, res) => {
             [Op.or]: [
                 {title: {[Op.like]: `%${search}%`}},
                 {author: {[Op.like]: `%${search}%`}},
-                {author: {[Op.like]: `%${search}%`}}
+                {genre: {[Op.like]: `%${search}%`}}
             ]
         },
         order: [['year', 'DESC']]
