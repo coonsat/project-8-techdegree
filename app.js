@@ -68,14 +68,6 @@ app.use( (err, req, res, next) => {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-    console.log(err)
-    // Render the error page
-
-    // if (err.name === 'Book not found') {
-    //     const msg = err.name;
-    //     res.render('page-not-found', {msg, err}); 
-    // }
-
     if (err.status === 404) {
         const message = err.message;
         res.render('page-not-found', { message, err });

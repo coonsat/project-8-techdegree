@@ -21,8 +21,6 @@ const errorHandler = (errorStatus, message, errorName, errorList) => {
     error.status = errorStatus;
     error.name = errorName;
     error.errors = errorList;
-    // console.log('At global handler')
-    // console.log(error);
     throw error;
 };
 
