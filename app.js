@@ -68,14 +68,27 @@ app.use( (err, req, res, next) => {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
+    console.log(err)
     // Render the error page
-    if (res.status === 404) {
-        const message = 'Something went wrong';
-        res.render('page_not_found', { message, err });
+
+    // if (err.name === 'Book not found') {
+    //     const msg = err.name;
+    //     res.render('page-not-found', {msg, err}); 
+    // }
+
+    if (err.status === 404) {
+        const message = err.message;
+        res.render('page-not-found', { message, err });
     } else {
-        const message = 'The page your looking for cannot be found';
-        res.status(err.status || 500);
-        res.render('error',  { message, err });
+
+        if (err.name === 'SequelizeValidationError') {
+            const sqlMessage = 'It seems like there was a validation error';
+            res.render('error',  { sqlMessage, err });
+        } else {
+            const message = 'An error occured.';
+            res.status(err.status || 500);
+            res.render('error',  { message, err });
+        }
     }
     next();
 });

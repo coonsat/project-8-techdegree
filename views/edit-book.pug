@@ -4,5 +4,11 @@ block content
 
     h1="Update Book"
 
-      form(action=`/books/${book.id}/edit` method="post")
-        include form
+    if errors
+      h2.error='Oooops!'
+      ul 
+        each error in errors
+          li.error=error.message
+
+    form(action=`/books/${book.id}/edit` method="post")
+      include form

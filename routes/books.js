@@ -9,7 +9,6 @@ const asyncHandler = cb => {
     return async(req, res, next) => {
         try {
             await cb(req, res, next);
-            console.log('After error triggered')
         } catch (error) {
             // Forward error to the global error handler
             next(error);
@@ -17,9 +16,13 @@ const asyncHandler = cb => {
     };
 };
 
-const errorHandler = (errorStatus, message) => {
+const errorHandler = (errorStatus, message, errorName, errorList) => {
     const error = new Error(message);
     error.status = errorStatus;
+    error.name = errorName;
+    error.errors = errorList;
+    // console.log('At global handler')
+    // console.log(error);
     throw error;
 };
 
@@ -69,7 +72,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     if ( book ) {
         res.render('book-detail', { book });
     } else {
-        errorHandler(404, "Book not found");
+        errorHandler(404, "The book you were looking for could not be found", "Book not found", null);
     }
   }
 ));
@@ -80,7 +83,7 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
     if (book) {
         res.render('edit-book', { book });
     } else {
-        errorHandler(404, "A problem occured when fetching your book");
+        errorHandler(404, "A problem occured when fetching your book", null, null);
     }
   }
 )
@@ -89,12 +92,18 @@ router.get('/:id/edit', asyncHandler(async (req, res) => {
 // Edit book from library
 router.post('/:id/edit', asyncHandler(async (req, res) => {
         let book = await Book.findByPk(req.params.id);
-        if (book) {
-            book = await book.update(req.body);
-            res.redirect('/');
-        } else {
-            errorHandler(404, "A problem occured when editing your book");
+
+        try {
+            if (book) {
+                book = await book.update(req.body);
+                res.redirect('/');
+            }
+
+        } catch (error) {
+            const errors = error.errors;
+            res.render('edit-book', { book, errors });
         }
+
       }
     )
 );
@@ -102,10 +111,12 @@ router.post('/:id/edit', asyncHandler(async (req, res) => {
 // First ask for confirmation to delete book
 router.get('/:id/delete', asyncHandler(async (req, res) => {
         const book = await Book.findByPk(req.params.id);
-        if (book) {
-            res.render('delete-book', { book });
-        } else {
-            errorHandler(404, "A problem occured when deleting your book");
+        try {
+            if (book) {
+                res.render('delete-book', { book });
+            }
+        } catch (error) {
+            errorHandler(404, "A problem occured when deleting your book", error.name, error.errors);
         }
     }
   )
@@ -114,11 +125,13 @@ router.get('/:id/delete', asyncHandler(async (req, res) => {
 // Delete book from library -> no caution added
 router.post('/:id/delete', asyncHandler(async (req, res) => {
         const book = await Book.findByPk(req.params.id);
-        if (book) {
-            await book.destroy();
-            res.redirect('/');
-        } else {
-            errorHandler(404, "A problem occured when deleting your book");
+        try {
+            if (book) {
+                await book.destroy();
+                res.redirect('/');
+            }
+        } catch(error) {
+            errorHandler(404, "A problem occured when deleting your book", error.name, error.errors);
         }
     }
   )
