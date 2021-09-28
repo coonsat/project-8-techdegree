@@ -33,7 +33,7 @@ router.get('/', asyncHandler(async (req, res) => {
 );
 
 // Post route to add book to database
-router.post('/add-book', asyncHandler(async (req, res) => {
+router.post('/new', asyncHandler(async (req, res) => {
         const book = {
                 title: req.body.title,
                 author: req.body.author,
@@ -52,14 +52,14 @@ router.post('/add-book', asyncHandler(async (req, res) => {
             res.redirect('/')
         } catch (error) {
             const errors = error.errors;
-            res.render('new-book', { book, errors });
+            res.render('new', { book, errors });
         }
     }
   )
 );
 
 // Form page for creating a new book
-router.get('/new-book', (req, res) => {
+router.get('/new', (req, res) => {
     res.render('new-book', {});
 });
 
@@ -79,7 +79,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 router.get('/:id/edit', asyncHandler(async (req, res) => {
     const book = await Book.findByPk(req.params.id);
     if (book) {
-        res.render('edit-book', { book });
+        res.render('update-book', { book });
     } else {
         errorHandler(404, "A problem occured when fetching your book", null, null);
     }
@@ -99,7 +99,7 @@ router.post('/:id/edit', asyncHandler(async (req, res) => {
 
         } catch (error) {
             const errors = error.errors;
-            res.render('edit-book', { book, errors });
+            res.render('update-book', { book, errors });
         }
 
       }
